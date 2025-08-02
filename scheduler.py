@@ -12,8 +12,8 @@ from typing import Dict, List, Tuple
 
 
 class InstructorScheduler:
-    def __init__(self):
-        self.time_slots = [1, 2]  # Hard-coded time slots
+    def __init__(self, time_slots = range(2)):
+        self.time_slots = time_slots
         
     def load_rooms(self, filename: str = 'rooms.csv'):
         """Load room data from CSV file."""
@@ -156,7 +156,7 @@ class InstructorScheduler:
             print("No schedule available to save. Please run optimize_schedule() first.")
 
 def main():
-    scheduler = InstructorScheduler()
+    scheduler = InstructorScheduler(time_slots=range(12))
     
     # Load data
     print("Loading room and course data...")
