@@ -12,8 +12,8 @@ from typing import Dict, List, Tuple
 
 
 class InstructorScheduler:
-    def __init__(self, time_slots = range(2)):
-        self.time_slots = time_slots
+    def __init__(self):
+        self.time_slots_df = None
         
     def load_rooms(self, filename: str = 'data/rooms.csv'):
         """Load room data from CSV file."""
@@ -54,11 +54,35 @@ class InstructorScheduler:
         except Exception as e:
             print(f"Error loading courses: {e}")
             return None
-    
+
+    def load_time_slots(self, filename: str = 'data/time_slots.csv'):
+        """Load time slot data from CSV file."""
+        try:
+            self.time_slots_df = pd.read_csv(filename)
+
+            # Check for duplicate time slots
+            slots = self.time_slots_df['Slot']
+            if len(slots) != len(slots.unique()):
+                duplicates = slots[slots.duplicated()].unique()
+                raise ValueError(f"Duplicate time slots found: {list(duplicates)}")
+
+            print(f"Loaded {len(self.time_slots_df)} time slots from {filename}")
+            return self.time_slots_df
+        except FileNotFoundError:
+            print(f"Error: {filename} not found")
+            return None
+        except Exception as e:
+            print(f"Error loading time slots: {e}")
+            return None
+
     def optimize_schedule(self):
         """Solve the instructor scheduling problem using integer linear programming."""
         if self.rooms_df is None or self.courses_df is None:
             print("Error: Room and course data must be loaded first")
+            return None
+
+        if self.time_slots_df is None:
+            print("Error: Time slot data must be loaded first")
             return None
         
         # Create the constraint satisfaction problem
@@ -67,7 +91,7 @@ class InstructorScheduler:
         # Extract input parameters
         courses = list(self.courses_df['Course'])
         rooms = list(self.rooms_df['Room'])
-        time_slots = list(self.time_slots)
+        time_slots = list(self.time_slots_df['Slot'])
         instructors = list(self.courses_df['Instructor'].unique())
 
         # Create dictionaries for enrollments and capacities
@@ -122,10 +146,13 @@ class InstructorScheduler:
             for room in rooms:
                 for t in time_slots:
                     if x[(course, room, t)].varValue == 1:
+                        slot_info = self.time_slots_df[self.time_slots_df['Slot'] == t].iloc[0]
                         schedule_data.append({
                             'Course': course,
                             'Room': room,
-                            'Time Slot': t,
+                            'Days': slot_info['Days'],
+                            'Start': slot_info['Start'],
+                            'End': slot_info['End'],
                             'Instructor': self.courses_df[self.courses_df['Course'] == course]['Instructor'].values[0]
                         })
         self.schedule = pd.DataFrame(schedule_data)
@@ -149,19 +176,22 @@ class InstructorScheduler:
             print("No schedule available to save. Please run optimize_schedule() first.")
 
 def main():
-    scheduler = InstructorScheduler(time_slots=range(12))
-    
+    scheduler = InstructorScheduler()
+
     # Load data
-    print("Loading room and course data...")
+    print("Loading room, course, and time slot data...")
     rooms = scheduler.load_rooms()
     courses = scheduler.load_courses()
-    
-    if rooms is not None and courses is not None:
+    time_slots = scheduler.load_time_slots()
+
+    if rooms is not None and courses is not None and time_slots is not None:
         print("\nRoom data preview:")
         print(rooms.head())
         print("\nCourse data preview:")
         print(courses.head())
-        
+        print("\nTime slot data preview:")
+        print(time_slots.head())
+
         # Optimize schedule
         scheduler.optimize_schedule()
         scheduler.display_schedule()
