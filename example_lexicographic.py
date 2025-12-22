@@ -24,8 +24,6 @@ scheduler.load_time_slots()
 
 objectives = [
     MinimizeClassesBefore("9:00"),
-    MinimizeClassesBefore("10:00"),
-    MinimizeClassesBefore("11:00")
 ]
 
 scheduler.lexicographic_optimize(objectives)

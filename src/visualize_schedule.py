@@ -26,7 +26,8 @@ def visualize_schedule(schedule_df, rooms_df, output_file='output/schedule_visua
                 'Day': day,
                 'Start': row['Start'],
                 'End': row['End'],
-                'Instructor': row['Instructor']
+                'Instructor': row['Instructor'],
+                'Enrollment': row['Enrollment']
             })
 
     schedule_exp_df = pd.DataFrame(schedule_expanded)
@@ -55,10 +56,28 @@ def visualize_schedule(schedule_df, rooms_df, output_file='output/schedule_visua
     if len(days) == 1:
         axes = [axes]
 
-    # Color map for courses
-    unique_courses = schedule_exp_df['Course'].unique()
-    colors = plt.cm.tab20(np.linspace(0, 1, len(unique_courses)))
-    course_colors = dict(zip(unique_courses, colors))
+    # Color map by year level (matching original visualization)
+    year_colors = {
+        1000: '#FFFFFF',  # White
+        2000: '#9BC2E6',  # Light blue
+        3000: '#A9D08E',  # Light green
+        4000: '#D9B3FF',  # Light purple
+        5000: '#FFD85D',  # Light yellow
+        6000: '#F1995D',  # Light orange
+    }
+
+    def get_course_color(course_name):
+        """Extract year level from course code and return color."""
+        # Extract number (e.g., "ASEN-2402-001" -> "2402")
+        parts = course_name.split('-')
+        if len(parts) >= 2 and parts[1].isdigit():
+            course_number = int(parts[1])
+            year_level = (course_number // 1000) * 1000  # Round down to thousand
+            return year_colors.get(year_level, '#BBBBBB')  # Gray for unknown
+        return '#BBBBBB'  # Gray default
+
+    course_colors = {course: get_course_color(course)
+                     for course in schedule_exp_df['Course'].unique()}
 
     for day_idx, day in enumerate(days):
         ax = axes[day_idx]
@@ -90,7 +109,7 @@ def visualize_schedule(schedule_df, rooms_df, output_file='output/schedule_visua
             text_y = room_idx
             ax.text(text_x, text_y + 0.15, course['Course'],
                    ha='center', va='center', fontsize=8, weight='bold')
-            ax.text(text_x, text_y - 0.15, f"({course['Instructor']})",
+            ax.text(text_x, text_y - 0.15, f"({course['Instructor']}, {int(course['Enrollment'])})",
                    ha='center', va='center', fontsize=7)
 
         # Draw vertical hour lines (in front of boxes)

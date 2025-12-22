@@ -251,8 +251,9 @@ class InstructorScheduler:
         if not self.setup_problem():
             return None
 
-        # Solve the problem
-        self.prob.solve()
+        # Solve the problem (msg=0 silences solver output)
+        solver = PULP_CBC_CMD(msg=0)
+        self.prob.solve(solver)
 
         # Check if the problem is solved
         if LpStatus[self.prob.status] != 'Optimal':
@@ -271,13 +272,15 @@ class InstructorScheduler:
             if self.x[k].varValue == 1:
                 course, room, t = k
                 slot_info = self.time_slots_df[self.time_slots_df['Slot'] == t].iloc[0]
+                course_info = self.courses_df[self.courses_df['Course'] == course].iloc[0]
                 schedule_data.append({
                     'Course': course,
                     'Room': room,
                     'Days': slot_info['Days'],
                     'Start': slot_info['Start'],
                     'End': slot_info['End'],
-                    'Instructor': self.courses_df[self.courses_df['Course'] == course]['Instructor'].values[0]
+                    'Instructor': course_info['Instructor'],
+                    'Enrollment': course_info['Enrollment']
                 })
         self.schedule = pd.DataFrame(schedule_data)
 
@@ -308,7 +311,8 @@ class InstructorScheduler:
 
         if not objectives:
             print("Warning: No objectives specified, using constraint satisfaction only")
-            self.prob.solve()
+            solver = PULP_CBC_CMD(msg=0)
+            self.prob.solve(solver)
             if LpStatus[self.prob.status] == 'Optimal':
                 self._extract_schedule()
                 return self.schedule
@@ -318,6 +322,9 @@ class InstructorScheduler:
                 return None
 
         print(f"\n=== Lexicographic Optimization: {len(objectives)} objectives ===\n")
+
+        # Create silent solver
+        solver = PULP_CBC_CMD(msg=0)
 
         # Optimize each objective in order
         for i, objective in enumerate(objectives):
@@ -331,8 +338,8 @@ class InstructorScheduler:
                 self.prob.sense = LpMaximize
                 self.prob.setObjective(objective.evaluate(self))
 
-            # Solve
-            self.prob.solve()
+            # Solve (msg=0 silences solver output)
+            self.prob.solve(solver)
 
             # Check solution status
             status = LpStatus[self.prob.status]
