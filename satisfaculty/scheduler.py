@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple, Optional, Callable, Iterable
 from .visualize_schedule import visualize_schedule
 from .utils import time_to_minutes, expand_days
 from .objective_base import ObjectiveBase
+from .constraint_base import ConstraintBase
 
 
 # Sentinel value for "match all" in filter_keys
@@ -72,7 +73,29 @@ def filter_keys(
 class InstructorScheduler:
     def __init__(self):
         self.time_slots_df = None
-        
+        self._constraints = []
+
+    def add_constraints(self, constraints: List[ConstraintBase]):
+        """
+        Add constraints to be applied during problem setup.
+
+        Args:
+            constraints: List of ConstraintBase instances to add
+
+        Example:
+            scheduler.add_constraints([
+                CourseAssignment(),
+                InstructorNoOverlap(),
+                RoomNoOverlap(),
+                RoomCapacity(),
+            ])
+        """
+        for constraint in constraints:
+            if not isinstance(constraint, ConstraintBase):
+                raise TypeError(f"Expected ConstraintBase instance, got {type(constraint).__name__}")
+            self._constraints.append(constraint)
+        print(f"Added {len(constraints)} constraint(s)")
+
     def load_rooms(self, filename: str = 'input/rooms.csv'):
         """Load room data from CSV file."""
         try:
@@ -227,32 +250,17 @@ class InstructorScheduler:
             for slot, days in zip(self.time_slots_df['Slot'], self.time_slots_df['Days'])
         }
 
-        # Course must be taught once
-        for course in self.courses:
-            self.prob += lpSum(self.x[k] for k in filter_keys(self.keys, course=course)) == 1
-
-        # Instructor can only be teaching one course at a time
-        for instructor in self.instructors:
-            for t in self.time_slots:
-                self.prob += lpSum(
-                    self.x[k] * self.a[(instructor, k[0])]
-                    for k in filter_keys(self.keys, predicate=self.make_overlap_predicate(t))
-                ) <= 1
-
-        # Room can only have one course at a time (checking for overlaps)
-        for room in self.rooms:
-            for t in self.time_slots:
-                self.prob += lpSum(
-                    self.x[k] for k in filter_keys(self.keys, predicate=self.make_overlap_predicate(t, room=room))
-                ) <= 1
-
-        # Room capacity constraints
-        for room in self.rooms:
-            for t in self.time_slots:
-                self.prob += lpSum(
-                    self.x[k] * self.enrollments[k[0]]
-                    for k in filter_keys(self.keys, room=room, time_slot=t)
-                ) <= self.capacities[room]
+        # Apply user-defined constraints
+        if not self._constraints:
+            print("Warning: No constraints added. Schedule may be invalid.")
+            print("Consider adding: CourseAssignment(), InstructorNoOverlap(), RoomNoOverlap(), RoomCapacity()")
+        else:
+            total_constraints = 0
+            for constraint in self._constraints:
+                count = constraint.apply(self)
+                print(f"  Applied: {constraint.name} ({count} constraints)")
+                total_constraints += count
+            print(f"Total: {total_constraints} constraints applied")
 
         return True
 

@@ -23,10 +23,11 @@
 [X] Names in output viz
 [X] Add notes to courses.csv
 [ ] Pull out main constraints
+[ ] Force Room
+[ ] Force Time Slot
 [ ] Add objectives
-[ ] Add Constrain
 [ ] add slack weights
-[ ] rename data to input
+[X] rename data to input
 
 Objectives
 [ ] Lab classes must be in certain rooms

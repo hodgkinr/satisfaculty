@@ -6,12 +6,25 @@ from .objectives import (
     MinimizeClassesAfter,
     MaximizePreferredRooms,
 )
+from .constraints import (
+    AssignAllCourses,
+    NoInstructorOverlap,
+    NoRoomOverlap,
+    RoomCapacity,
+)
 from .visualize_schedule import visualize_schedule
 
 __all__ = [
     "InstructorScheduler",
+    # Objectives
     "MinimizeClassesBefore",
     "MinimizeClassesAfter",
     "MaximizePreferredRooms",
+    # Constraints
+    "AssignAllCourses",
+    "NoInstructorOverlap",
+    "NoRoomOverlap",
+    "RoomCapacity",
+    # Utilities
     "visualize_schedule",
 ]

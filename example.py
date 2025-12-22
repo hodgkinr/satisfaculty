@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """
-Example script demonstrating lexicographic optimization.
+Example script demonstrating lexicographic optimization with configurable constraints.
 
-This shows how to define custom objective priorities for schedule optimization.
-Each user can create their own script with different objective orderings.
+This shows how to define custom constraints and objective priorities for schedule optimization.
+Each user can create their own script with different constraint and objective configurations.
 """
 
 from satisfaculty import (
     InstructorScheduler,
+    # Constraints
+    AssignAllCourses,
+    NoInstructorOverlap,
+    NoRoomOverlap,
+    RoomCapacity,
+    # Objectives
     MinimizeClassesBefore,
     MinimizeClassesAfter,
     MaximizePreferredRooms,
@@ -18,6 +24,15 @@ scheduler.load_rooms('input/rooms.csv')
 scheduler.load_courses('input/courses.csv')
 scheduler.load_time_slots('input/time_slots.csv')
 
+# Add constraints (required for a valid schedule)
+scheduler.add_constraints([
+    AssignAllCourses(),
+    NoInstructorOverlap(),
+    NoRoomOverlap(),
+    RoomCapacity(),
+])
+
+# Define optimization objectives (in priority order)
 objectives = [
     MinimizeClassesBefore('9:00'),
 ]
