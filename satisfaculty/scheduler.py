@@ -73,7 +73,7 @@ class InstructorScheduler:
     def __init__(self):
         self.time_slots_df = None
         
-    def load_rooms(self, filename: str = 'data/rooms.csv'):
+    def load_rooms(self, filename: str = 'input/rooms.csv'):
         """Load room data from CSV file."""
         try:
             self.rooms_df = pd.read_csv(filename)
@@ -93,7 +93,7 @@ class InstructorScheduler:
             print(f"Error loading rooms: {e}")
             return None
     
-    def load_courses(self, filename: str = 'data/courses.csv'):
+    def load_courses(self, filename: str = 'input/courses.csv'):
         """Load course data from CSV file."""
         try:
             self.courses_df = pd.read_csv(filename)
@@ -113,7 +113,7 @@ class InstructorScheduler:
             print(f"Error loading courses: {e}")
             return None
 
-    def load_time_slots(self, filename: str = 'data/time_slots.csv'):
+    def load_time_slots(self, filename: str = 'input/time_slots.csv'):
         """Load time slot data from CSV file."""
         try:
             self.time_slots_df = pd.read_csv(filename)

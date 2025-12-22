@@ -143,7 +143,7 @@ def main():
     """Load schedule and create visualization."""
     print("Loading schedule data...")
     schedule_df = pd.read_csv('output/schedule.csv')
-    rooms_df = pd.read_csv('data/rooms.csv')
+    rooms_df = pd.read_csv('input/rooms.csv')
 
     print(f"Loaded {len(schedule_df)} scheduled courses")
 
