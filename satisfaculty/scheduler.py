@@ -414,6 +414,8 @@ class InstructorScheduler:
     def save_schedule(self, filename: str = 'output/schedule.csv'):
         """Save the optimized schedule to a CSV file."""
         if self.schedule is not None:
+            import os
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
             self.schedule.to_csv(filename, index=False)
             print(f"Schedule saved to {filename}")
         else:

@@ -134,6 +134,8 @@ def visualize_schedule(schedule_df, rooms_df, output_file='output/schedule_visua
         ax.set_ylabel('Room (Capacity)')
 
     plt.tight_layout()
+    import os
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     plt.savefig(output_file, dpi=150, bbox_inches='tight')
     print(f"\nSchedule visualization saved to {output_file}")
     plt.close()
