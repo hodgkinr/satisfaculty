@@ -14,14 +14,14 @@ from satisfaculty import (
 )
 
 scheduler = InstructorScheduler()
-scheduler.load_rooms()
-scheduler.load_courses()
-scheduler.load_time_slots()
+scheduler.load_rooms('data/rooms.csv')
+scheduler.load_courses('data/courses.csv')
+scheduler.load_time_slots('data/time_slots.csv')
 
 objectives = [
     MinimizeClassesBefore("9:00"),
 ]
 
 scheduler.lexicographic_optimize(objectives)
-
-scheduler.visualize_schedule()
+scheduler.save_schedule('output/schedule.csv')
+scheduler.visualize_schedule('output/schedule_visual.png')

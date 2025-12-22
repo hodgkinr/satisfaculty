@@ -291,7 +291,8 @@ class InstructorScheduler:
                     'Start': slot_info['Start'],
                     'End': slot_info['End'],
                     'Instructor': course_info['Instructor'],
-                    'Enrollment': course_info['Enrollment']
+                    'Enrollment': course_info['Enrollment'],
+                    'Note': course_info.get('Note', '')
                 })
         self.schedule = pd.DataFrame(schedule_data)
 
@@ -410,16 +411,19 @@ class InstructorScheduler:
         else:
             print("No schedule available to save. Please run optimize_schedule() first.")
 
-    def visualize_schedule(self):
+    def visualize_schedule(self, output_file='output/schedule_visual.png'):
         """
         Visualize the optimized schedule.
 
         Creates a visual representation of the schedule showing courses
         arranged by time and day. Delegates to visualize_schedule module
         for the actual visualization logic.
+
+        Args:
+            output_file: Path to save the visualization PNG (default: 'output/schedule_visual.png')
         """
         if self.schedule is not None:
-            visualize_schedule(self.schedule, self.rooms_df)
+            visualize_schedule(self.schedule, self.rooms_df, output_file)
         else:
             print("No schedule available to visualize. Please run optimize_schedule() or lexicographic_optimize() first.")
 
