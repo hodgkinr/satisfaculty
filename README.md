@@ -16,23 +16,16 @@ pip install -e .
 from satisfaculty import InstructorScheduler, MinimizeClassesBefore
 
 scheduler = InstructorScheduler()
-scheduler.load_rooms()
-scheduler.load_courses()
-scheduler.load_time_slots()
+scheduler.load_rooms('example/rooms.csv')
+scheduler.load_courses('example/courses.csv')
+scheduler.load_time_slots(`example/time_slots.csv')
 
 objectives = [MinimizeClassesBefore("9:00")]
 scheduler.lexicographic_optimize(objectives)
 scheduler.visualize_schedule()
 ```
 
-## Example
-
-See the `example/` directory for a complete working example with sample data. To run it:
-
-```bash
-cd example
-python example.py
-```
+This will output a complete schedule:
 
 ![Example schedule output](docs/schedule_visual.png)
 
