@@ -42,13 +42,13 @@ def filter_keys(
 
     Examples:
         # Match all rooms/times for a specific course
-        filter_keys(keys, course='ASEN-2402-001')
+        filter_keys(keys, course='DEPT-2402-001')
 
         # Match all courses/times for a specific room
-        filter_keys(keys, room='AERO 120')
+        filter_keys(keys, room='BLDG 120')
 
         # Match specific course and room, all time slots
-        filter_keys(keys, course='ASEN-2402-001', room='AERO 120')
+        filter_keys(keys, course='DEPT-2402-001', room='BLDG 120')
 
         # Match all keys (no filtering)
         filter_keys(keys)
@@ -327,8 +327,8 @@ class InstructorScheduler:
 
         Example:
             objectives = [
-                MinimizeClassesBefore("9:00", instructor="Neogi"),
-                MaximizePreferredRooms(["AERO 120", "AERO 220"]),
+                MinimizeClassesBefore("9:00", instructor="Nelson"),
+                MaximizePreferredRooms(["BLDG 120", "BLDG 220"]),
                 MinimizeTimeSlotSpread()
             ]
             scheduler.lexicographic_optimize(objectives)

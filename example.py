@@ -6,20 +6,7 @@ This shows how to define custom constraints and objective priorities for schedul
 Each user can create their own script with different constraint and objective configurations.
 """
 
-from satisfaculty import (
-    InstructorScheduler,
-    # Constraints
-    AssignAllCourses,
-    NoInstructorOverlap,
-    NoRoomOverlap,
-    RoomCapacity,
-    ForceRooms,
-    ForceTimeSlots,
-    # Objectives
-    MinimizeClassesBefore,
-    MinimizeClassesAfter,
-    MaximizePreferredRooms,
-)
+from satisfaculty import *
 
 scheduler = InstructorScheduler()
 scheduler.load_rooms('input/rooms.csv')
@@ -36,7 +23,7 @@ scheduler.add_constraints([
     ForceTimeSlots(),
 ])
 
-# Define optimization objectives (in priority order)
+# Define lexicographic optimization objectives (in priority order)
 objectives = [
     MinimizeClassesBefore('9:00'),
 ]

@@ -68,7 +68,7 @@ def visualize_schedule(schedule_df, rooms_df, output_file='output/schedule_visua
 
     def get_course_color(course_name):
         """Extract year level from course code and return color."""
-        # Extract number (e.g., "ASEN-2402-001" -> "2402")
+        # Extract number (e.g., "DEPT-2402-001" -> "2402")
         parts = course_name.split('-')
         if len(parts) >= 2 and parts[1].isdigit():
             course_number = int(parts[1])

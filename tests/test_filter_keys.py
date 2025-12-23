@@ -172,13 +172,13 @@ def test_scheduler_method_integration():
         scheduler.optimize_schedule()
 
         # Test filtering
-        filtered = scheduler.filter_schedule_keys(course='ASEN-2402-001')
+        filtered = scheduler.filter_schedule_keys(course='DEPT-2402-001')
         assert isinstance(filtered, list), 'Should return a list'
 
         # All filtered keys should have the specified course
         if len(filtered) > 0:
-            assert all(c == 'ASEN-2402-001' for c, r, t in filtered), \
-                'All results should have course ASEN-2402-001'
+            assert all(c == 'DEPT-2402-001' for c, r, t in filtered), \
+                'All results should have course DEPT-2402-001'
 
         print('✓ test_scheduler_method_integration passed')
     else:
