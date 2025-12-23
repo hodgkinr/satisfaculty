@@ -71,9 +71,17 @@ def filter_keys(
 
 
 class InstructorScheduler:
-    def __init__(self):
+    def __init__(self, solver_verbose: bool = False):
+        """
+        Initialize the instructor scheduler.
+
+        Args:
+            solver_verbose: If True, display solver output during optimization.
+                           If False (default), solver runs silently.
+        """
         self.time_slots_df = None
         self._constraints = []
+        self.solver_verbose = solver_verbose
 
     def add_constraints(self, constraints: List[ConstraintBase]):
         """
@@ -270,8 +278,8 @@ class InstructorScheduler:
         if not self.setup_problem():
             return None
 
-        # Solve the problem (msg=0 silences solver output)
-        solver = PULP_CBC_CMD(msg=0)
+        # Solve the problem
+        solver = PULP_CBC_CMD(msg=1 if self.solver_verbose else 0)
         self.prob.solve(solver)
 
         # Check if the problem is solved
@@ -331,7 +339,7 @@ class InstructorScheduler:
 
         if not objectives:
             print("Warning: No objectives specified, using constraint satisfaction only")
-            solver = PULP_CBC_CMD(msg=0)
+            solver = PULP_CBC_CMD(msg=1 if self.solver_verbose else 0)
             self.prob.solve(solver)
             if LpStatus[self.prob.status] == 'Optimal':
                 self._extract_schedule()
@@ -343,8 +351,8 @@ class InstructorScheduler:
 
         print(f"\n=== Lexicographic Optimization: {len(objectives)} objectives ===\n")
 
-        # Create silent solver
-        solver = PULP_CBC_CMD(msg=0)
+        # Create solver
+        solver = PULP_CBC_CMD(msg=1 if self.solver_verbose else 0)
 
         # Optimize each objective in order
         for i, objective in enumerate(objectives):
@@ -358,7 +366,6 @@ class InstructorScheduler:
                 self.prob.sense = LpMaximize
                 self.prob.setObjective(objective.evaluate(self))
 
-            # Solve (msg=0 silences solver output)
             self.prob.solve(solver)
 
             # Check solution status

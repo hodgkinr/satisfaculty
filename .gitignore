@@ -23,6 +23,3 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
-
-# Personal notes
-journal.txt
