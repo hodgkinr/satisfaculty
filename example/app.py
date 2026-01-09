@@ -1,9 +1,15 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, session, redirect, url_for
 import subprocess
 import os
+from functools import wraps
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD")
 
 
 CSV_FILES = {
@@ -12,7 +18,27 @@ CSV_FILES = {
     "time_slots": "time_slots.csv"
 }
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'password' not in session or session['password'] != BASIC_AUTH_PASSWORD:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        password = request.form.get("password")
+        if password == BASIC_AUTH_PASSWORD:
+            session['password'] = password
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('index'))
+    return render_template("login.html")
+
+
 @app.route("/", methods=["GET", "POST"])
+@login_required
 def index():
     result_ready = False
 
@@ -25,7 +51,7 @@ def index():
 
         # Run the existing script
         subprocess.run(
-            ["python", "example.py"],
+            ["python3", "example.py"],
             cwd=BASE_DIR,
             check=True
         )
